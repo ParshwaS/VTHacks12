@@ -21,6 +21,10 @@ const NavigationMenuDemo = withAuthInfo((props: WithAuthInfoProps) => {
 			link: "/settings",
 		},
 	];
+	const acct = props.accessToken;
+console.log(acct)
+
+
 
 	return (
 		<nav className="mb-3 min-h-[50px] border-[1px] rounded-lg grid sm:grid-cols-12 items-center p-2">
