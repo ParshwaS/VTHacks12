@@ -25,7 +25,7 @@ const NavigationMenuDemo = withAuthInfo((props: WithAuthInfoProps) => {
 	return (
 		<nav className="mb-3 min-h-[50px] border-[1px] rounded-lg grid sm:grid-cols-12 items-center p-2">
 			<Link href="/" className="sm:col-span-1 font-bold w-fit">
-				AirGST
+				VTHacks 12
 			</Link>
 			<div className="sm:col-span-9 flex flex-row gap-2">
 				{items.map((item) => (

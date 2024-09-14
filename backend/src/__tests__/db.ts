@@ -19,7 +19,7 @@ export let closeDatabase = async () => {
 	await mongoose.connection.dropDatabase();
 	await mongoose.connection.close();
 	await mongod.stop();
-};
+}; 
 
 export let clearDatabase = async () => {
 	let collections = mongoose.connection.collections;
