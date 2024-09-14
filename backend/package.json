@@ -23,6 +23,7 @@
     "typescript": "^5.0.0"
   },
   "dependencies": {
+    "@propelauth/express": "^2.1.22",
     "@types/bcryptjs": "^2.4.6",
     "@types/jsonwebtoken": "^9.0.6",
     "@types/pino": "^7.0.5",
