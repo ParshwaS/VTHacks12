@@ -5,27 +5,22 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Search, Home, Building2, MapPin } from "lucide-react"
 import Image from "next/image"
-
-const data = [
-  { month: 'Jan', price: 300000 },
-  { month: 'Feb', price: 305000 },
-  { month: 'Mar', price: 310000 },
-  { month: 'Apr', price: 315000 },
-  { month: 'May', price: 320000 },
-  { month: 'Jun', price: 318000 },
-  { month: 'Jul', price: 325000 },
-  { month: 'Aug', price: 330000 },
-  { month: 'Sep', price: 335000 },
-  { month: 'Oct', price: 340000 },
-  { month: 'Nov', price: 345000 },
-  { month: 'Dec', price: 350000 },
-];
+import LineChart from "./LineChart";
 
 const cardColors = [
   { bg: "bg-pink-100", text: "text-pink-800", icon: "text-pink-500" },
   { bg: "bg-blue-100", text: "text-blue-800", icon: "text-blue-500" },
   { bg: "bg-green-100", text: "text-green-800", icon: "text-green-500" },
   { bg: "bg-purple-100", text: "text-purple-800", icon: "text-purple-500" },
+];
+
+export const data = [
+  { date: new Date(2021, 0, 1), price: 300000 },
+  { date: new Date(2021, 1, 1), price: 320000 },
+  { date: new Date(2021, 2, 1), price: 310000 },
+  { date: new Date(2021, 3, 1), price: 330000 },
+  { date: new Date(2021, 4, 1), price: 340000 },
+  { date: new Date(2021, 5, 1), price: 350000 },
 ];
 
 export default function LandingPage() {
@@ -91,7 +86,7 @@ export default function LandingPage() {
               </CardHeader>
               <CardContent>
                 <div className="h-[400px] w-full">
-                  
+                  <LineChart data={data} />
                 </div>
               </CardContent>
             </Card>
