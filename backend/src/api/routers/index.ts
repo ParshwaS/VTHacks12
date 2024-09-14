@@ -1,11 +1,13 @@
-import { Router } from "express";
-import authRouter from "./auth.routes";
-import rentCastRouter from "./rentCast.routes";
+import { Router } from 'express';
+import authRoutes from './auth.routes';  // Assuming this exists
+import rentalListingRoutes from './rentCast.routes'; // New rental routes
 
-const router = Router();
+const mainRouter = Router();
 
-router.use("/auth", authRouter);
+// Auth routes
+mainRouter.use('/auth', authRoutes);
 
-router.use("/rentCast", rentCastRouter);
+// Rental Listing routes
+mainRouter.use('/rentals', rentalListingRoutes);
 
-export default router;
+export default mainRouter;
