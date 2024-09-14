@@ -38,9 +38,15 @@ export const fetchRentalListingsFromAPI = async (
 
   try {
     const response = await axios(fullUrl, options);
+
+     // Check if the response is empty and throw an error if necessary
+     if (!response.data || response.data.length === 0) {
+      throw new Error('No rental listings found for the provided criteria.');
+    }
+
     return response.data; // Return the rental listings data
-  } catch (error) {
-    throw new Error('Error fetching data from external API');
+  } catch (error: any) {
+    throw new Error(error.message || 'Error fetching data from external API');
   }
 };
 
