@@ -1,13 +1,14 @@
 import { Router } from 'express';
-import authRoutes from './auth.routes';  // Assuming this exists
-import rentalListingRoutes from './rentCast.routes'; // New rental routes
+import authRouter from "./auth.routes";
+import rentCastRouter from "./rentCast.routes";
+import portfolioRouter from "./portfolio.routes";
 
 const mainRouter = Router();
 
-// Auth routes
-mainRouter.use('/auth', authRoutes);
-
 // Rental Listing routes
-mainRouter.use('/rentals', rentalListingRoutes);
+mainRouter.use('/rentals', rentCastRouter);
+mainRouter.use("/auth", authRouter);
+mainRouter.use("/rentCast", rentCastRouter);
+mainRouter.use("/portfolio", portfolioRouter);
 
 export default mainRouter;
