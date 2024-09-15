@@ -8,35 +8,27 @@ const qolDataPerNPASchema = new Schema({
 	},
 	violentCrime: {
 		type: Number,
-		required: true,
 	},
 	propertyCrime: {
 		type: Number,
-		required: true,
 	},
 	nuisanceViolation: {
 		type: Number,
-		required: true,
 	},
 	proximityToParks: {
 		type: Number,
-		required: true,
 	},
 	proximityToHealthcare: {
 		type: Number,
-		required: true,
 	},
 	proximityToTransportation: {
 		type: Number,
-		required: true,
 	},
 	proximityToGroceries: {
 		type: Number,
-		required: true,
 	},
 	proximityToPharmacies: {
 		type: Number,
-		required: true,
 	},
 	dataYear: {
 		type: Number,
@@ -61,4 +53,4 @@ const qolDataPerNPASchema = new Schema({
 });
 
 // Export the model
-export const QolData = model("QolData", qolDataPerNPASchema); // QolData is the name of the model
+export const QolData = model("QolData", qolDataPerNPASchema, "QolData"); // QolData is the name of the model
