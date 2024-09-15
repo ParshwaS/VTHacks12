@@ -61,4 +61,4 @@ const qolDataPerNPASchema = new Schema({
 });
 
 // Export the model
-export const QolData = model("QolData", qolDataPerNPASchema); // QolData is the name of the model
+export const QolData = model("QolData", qolDataPerNPASchema, "QolData"); // QolData is the name of the model
