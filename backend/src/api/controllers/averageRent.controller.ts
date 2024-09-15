@@ -1,10 +1,10 @@
-import { calculateAverageRentPerMonth } from '@/lib/service/averageRentPerMonth.service';
 import { Request, Response } from 'express';
 import { fetchRentalListingsFromAPI } from '@/lib/service/rentalListing.service';
 import { RentalService } from '@/lib/service/averagePricePerSqft.service';
+import { calculateAverageRentPerQuarter } from '@/lib/service/averageRentPerQuarter.service';
 
 
-export const getAverageRentPerMonth = async (req: Request, res: Response) => {
+export const getAverageRentPerQuarter = async (req: Request, res: Response) => {
     
     const { limit = 500, page = 1, city, state, bedrooms, bathrooms, zipCode } = req.query;
 
@@ -25,7 +25,7 @@ export const getAverageRentPerMonth = async (req: Request, res: Response) => {
     // console.log(rentalListings);
 
     // Calculate the average rent per month using the service
-    const averageRentData = await calculateAverageRentPerMonth(rentalListings);
+    const averageRentData = await calculateAverageRentPerQuarter(rentalListings);
 
     // Return the data as JSON
     return res.status(200).json({
