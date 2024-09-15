@@ -111,7 +111,6 @@ const CrimeRate: React.FC<WithAuthInfoProps> = ({ accessToken }) => {
     .style("text-anchor", "middle")
     .text("Crime Rate per 100 Housings");
 
-
     return () => {
       d3.select(svgRef.current).selectAll('*').remove();  // Clean up on re-render
     };

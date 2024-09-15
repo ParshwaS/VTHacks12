@@ -16,6 +16,7 @@ const Heatmap = ({ zipcode }: { zipcode: string | null }) => {
   const svgRef = useRef<SVGSVGElement | null>(null);
   const [dimensions, setDimensions] = useState({ width: 600, height: 600 });
 
+  const [dimensions, setDimensions] = useState({ width: 500, height: 430 });
   useEffect(() => {
     const updateDimensions = () => {
       if (svgRef.current) {
