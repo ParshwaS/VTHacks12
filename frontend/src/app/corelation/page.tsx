@@ -46,18 +46,19 @@ function Correlation() {
 
     // Use the maximum absolute value to set the y scale domain
     const y = d3.scaleLinear()
-      .domain([0, d3.max(data, d => Math.max(Math.abs(d.rentalPriceChange), Math.abs(d.salePriceChange))) as number])
+      // .domain([0, d3.max(data, d => Math.max(Math.abs(d.rentalPriceChange), Math.abs(d.salePriceChange))) as number])
+      .domain([-7, 7])
       .range([height, 0]);
 
     // Define the line generator for rental price changes (use absolute values for plotting)
     const rentalLine = d3.line<DataPoint>()
       .x(d => x(parseDate(d.date) as Date) as number)
-      .y(d => y(Math.abs(d.rentalPriceChange)) as number);
+      .y(d => y(d.rentalPriceChange) as number);
 
     // Define the line generator for sale price changes (use absolute values for plotting)
     const saleLine = d3.line<DataPoint>()
       .x(d => x(parseDate(d.date) as Date) as number)
-      .y(d => y(Math.abs(d.salePriceChange)) as number);
+      .y(d => y(d.salePriceChange) as number);
 
     // Add X axis
     svg.append('g')
@@ -103,7 +104,7 @@ function Correlation() {
       .data(data)
       .enter().append('circle')
       .attr('cx', d => x(parseDate(d.date) as Date) as number)
-      .attr('cy', d => y(Math.abs(d.rentalPriceChange)) as number) // Plot with absolute values
+      .attr('cy', d => y(d.rentalPriceChange) as number) // Plot with absolute values
       .attr('r', 4)
       .attr('fill', d => d.rentalPriceChange >= 0 ? 'green' : 'red')
       .on('mouseover', function (event, d) {
@@ -133,7 +134,7 @@ svg.selectAll('.sale-dot')
   .data(data)
   .enter().append('circle')
   .attr('cx', d => x(parseDate(d.date) as Date) as number)
-  .attr('cy', d => y(Math.abs(d.salePriceChange)) as number)  // Take the absolute value for plotting
+  .attr('cy', d => y(d.salePriceChange) as number)  // Take the absolute value for plotting
   .attr('r', 4)
   .attr('fill', d => d.salePriceChange >= 0 ? 'green' : 'red')  // Color based on positive (green) or negative (red)
   .on('mouseover', function (event, d) {
