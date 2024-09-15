@@ -183,19 +183,49 @@ const Portfolio = withAuthInfo(({ accessToken }) => {
             </Table>
           </CardContent>
         </Card>
-<<<<<<< HEAD
-=======
 
 
-
-
-
-
-
-
-
-        
->>>>>>> 7b576c4bfac98d7bcaf59127d86d3dc4d8458acc
+{/* Rental Properties Section */}
+{portfolioData?.properties.some((property: any) => property.isForRent) && (
+          <Card className="bg-white shadow-lg mt-8">
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle className="text-xl font-semibold text-gray-800">Rental Properties</CardTitle>
+              <HomeIcon className="h-5 w-5 text-gray-400" />
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="text-gray-600">Property Name</TableHead>
+                    <TableHead className="text-gray-600">Rent/Month</TableHead>
+                    <TableHead className="text-gray-600">Total Collected</TableHead>
+                    <TableHead className="text-gray-600">Rent Due</TableHead>
+                    <TableHead className="text-gray-600">Status</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {portfolioData.properties
+                    .filter((property: any) => property.isForRent)
+                    .map((property: any) => (
+                      <TableRow key={property._id} className="hover:bg-gray-50">
+                        <TableCell className="font-medium text-gray-800">{property.name}</TableCell>
+                        <TableCell>${property.rentPerMonth?.toLocaleString()}</TableCell>
+                        <TableCell>${property.totalRentCollected?.toLocaleString()}</TableCell>
+                        <TableCell>${property.totalRentDue?.toLocaleString()}</TableCell>
+                        <TableCell>
+                          <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                            property.isPaid ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                          }`}>
+                            {property.isPaid ? 'Paid' : 'Due'}
+                          </span>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        )}
       </div>
     )
   });

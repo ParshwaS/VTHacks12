@@ -18,7 +18,7 @@ export default function RootLayout({
 			<head>
 				<title>VTHacks12</title>
 			</head>
-			<body className={inter.className + " m-3"}>
+			<body className={inter.className}>
 				<AuthProvider authUrl={process.env.NEXT_PUBLIC_AUTH_URL!}>
 					<ThemeProvider
 						attribute="class"
