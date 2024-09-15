@@ -40,7 +40,7 @@ const LineChart1 = withAuthInfo(({ accessToken }) => {
     if (!svgRef.current || GDdata.length === 0) return;
 
     const margin = { top: 20, right: 30, bottom: 50, left: 60 };
-    const width = 800 - margin.left - margin.right;
+    const width = 1000 - margin.left - margin.right;
     const height = 500 - margin.top - margin.bottom;
 
     // Set up the SVG container
