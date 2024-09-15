@@ -20,7 +20,7 @@ const PricesByTimeChart: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    const svgWidth = 800;
+    const svgWidth = 1000;
     const svgHeight = 400;
     const margin = { top: 20, right: 30, bottom: 40, left: 50 };
     const width = svgWidth - margin.left - margin.right;
@@ -74,19 +74,21 @@ const PricesByTimeChart: React.FC = () => {
     // Create Y axis
     svg.append('g').call(d3.axisLeft(y));
 
+    const line = d3
+      .line<DataPoint>()
+      .x((d) => x(d.date))
+      .y((d) => y(d.pricePerSqFt));
+
     // Bars
     svg
-      .selectAll('.bar')
-      .data(data)
-      .enter()
-      .append('rect')
-      .attr('class', 'bar')
-      .attr('x', (d) => x(d.date)!)
-      .attr('y', (d) => y(d.pricePerSqFt))
-      .attr('width', width / data.length - 10) // Adjust width
-      .attr('height', (d) => height - y(d.pricePerSqFt))
-      .attr('fill', 'steelblue');
-
+      .append('path')
+      .data([data])
+      .attr('class', 'line')
+      .attr('d', line)
+      .style('fill', 'none')
+      .style('stroke', 'steelblue')
+      .style('stroke-width', '2px');
+      
     // Cleanup chart on unmount
     return () => {
       d3.select(chartRef.current).selectAll('*').remove();
