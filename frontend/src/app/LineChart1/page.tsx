@@ -1,6 +1,6 @@
 "use client";
 import { withAuthInfo } from '@propelauth/react';
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
 
 // Average rent vs time and no of bedrooms
@@ -18,15 +18,17 @@ const generateDummyData = (): DataPoint[] => {
 
   return months.map(month => ({
     date: month,
-    "1-bedroom": Math.random() * 200000 + 100000,
-    "2-bedroom": Math.random() * 250000 + 150000,
-    "3-bedroom": Math.random() * 300000 + 200000,
-    "4-bedroom": Math.random() * 350000 + 250000
+    "1-bedroom": 200000 + 100000,
+    "3-bedroom": 300000 + 200000,
+    "4-bedroom": 350000 + 250000,
+    "2-bedroom": 250000 + 150000,
   }));
 };
 
 const LineChart1 = withAuthInfo(({ accessToken }) => {
   const svgRef = useRef<SVGSVGElement | null>(null);
+  const [hoveredLegend, setHoveredLegend] = useState<string | null>(null);
+
 
   useEffect(() => {
     if (!svgRef.current) return;
@@ -85,6 +87,7 @@ const LineChart1 = withAuthInfo(({ accessToken }) => {
           .y(d => y(d[key] as number)))
         .style('fill', 'none')
         .style('stroke', color(`${i}`))
+        .style('opacity', 0.7)
         .style('stroke-width', '2px');
     });
 
@@ -93,7 +96,26 @@ const LineChart1 = withAuthInfo(({ accessToken }) => {
       .data(Object.keys(data[0]).filter(key => key !== 'date'))
       .enter().append("g")
       .attr("class", "legend")
-      .attr("transform", (d, i) => `translate(0,${i * 20})`);
+      .attr("transform", (d, i) => `translate(0,${i * 25})`)
+      .on("mouseover", function(event, d) {
+        // Highlight only the hovered line
+        setHoveredLegend(d as string);
+
+        svg.selectAll('.line')
+          .style('opacity', function(lineKey, e){ 
+            if(lineKey === d){
+              return 3;
+            }else {
+              return 0.1;
+            }
+          });
+      })
+      .on("mouseout", function(event, d) {
+        // Reset line visibility
+        svg.selectAll('.line')
+          .style('opacity', 1);
+        setHoveredLegend(null);
+      });
 
     legend.append("rect")
       .attr("x", width - 18)
@@ -107,7 +129,7 @@ const LineChart1 = withAuthInfo(({ accessToken }) => {
       .attr("dy", ".35em")
       .style("text-anchor", "end")
       .text(d => d);
-  }, []); // Empty dependency array means this effect runs once after initial render
+  }, [hoveredLegend]); // Empty dependency array means this effect runs once after initial render
 
   return (
     <div>
