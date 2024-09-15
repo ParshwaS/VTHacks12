@@ -20,7 +20,7 @@ const PricesByTimeChart = ({ zipcode }: { zipcode: string | null }) => {
   }, [zipcode]);
 
   useEffect(() => {
-    const svgWidth = 1000;
+    const svgWidth = 800;
     const svgHeight = 400;
     const margin = { top: 20, right: 30, bottom: 65, left: 50 };
     const width = svgWidth - margin.left - margin.right;

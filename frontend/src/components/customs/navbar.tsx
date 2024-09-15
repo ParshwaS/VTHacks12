@@ -18,7 +18,7 @@ const NavigationMenuDemo = withAuthInfo((props: WithAuthInfoProps) => {
 	const items = [
 		{
 			title: "Dashboard",
-			link: "/dashboard",
+			link: "/portfolio",
 		},
 		{
 			title: "Analysis",
