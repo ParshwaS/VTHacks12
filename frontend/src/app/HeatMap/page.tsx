@@ -11,7 +11,8 @@ const data = [
   { areaCode: '10005', grocery: 90, pharmacy: 85, healthcare: 80, transportation: 95, park: 85 }
 ];
 
-const Heatmap = () => {
+const Heatmap = ({ zipcode }: { zipcode: string | null }) => {
+  const [data, setData] = useState<any[]>([]);
   const svgRef = useRef<SVGSVGElement | null>(null);
   const [dimensions, setDimensions] = useState({ width: 500, height: 400 });
   useEffect(() => {
@@ -35,12 +36,33 @@ const Heatmap = () => {
   }, []);
 
   useEffect(() => {
+    console.log("Fetching data for zipcode:", zipcode);
+    // Fetch data based on the selected zipcode
+    const fetchData = async () => {
+      const response = await fetch(process.env.NEXT_PUBLIC_BACKEND_URI! + `/api/qol/proximity?zip=${zipcode || '10001'}`);
+      const result = await response.json();
+      result.forEach((el: any) => {
+        el.areaCode = el.year.toString();
+        el.grocery = el.avgProximityToGroceries || 0;
+        el.pharmacy = el.avgProximityToPharmacies || 0;
+        el.healthcare = el.avgProximityToHealthcare || 0;
+        el.transportation = el.avgProximityToTransportation || 0;
+        el.park = el.avgProximityToParks || 0;
+      });
+      setData(result);
+    };
+
+    fetchData();
+  }, [zipcode]);
+
+  useEffect(() => {
     if (!svgRef.current) return;
 
     const margin = { top: 30, right: 105, bottom: 70, left: 95 };
     const { width, height } = dimensions;
     // const width = 600 - margin.left - margin.right;
     // const height = 500 - margin.top - margin.bottom;
+    d3.select(svgRef.current).select("*").remove(); // Clear previous content
 
     const svg = d3.select(svgRef.current)
       .attr('width', width)
@@ -82,7 +104,10 @@ const Heatmap = () => {
       .style('font-size', '14px')  // Font size
       .style('font-family', 'Arial')  // Font family
       .attr('transform', `translate(0,${height - margin.top - margin.bottom})`)
-      .call(d3.axisBottom(x));
+      .call(d3.axisBottom(x))
+      .selectAll('text')  // Select all text elements (tick labels)
+      .attr('transform', 'rotate(-45)')  // Rotate 45 degrees counter-clockwise
+      .style('text-anchor', 'end');
 
     svg.append('g')
       .attr('class', 'y-axis')
@@ -117,7 +142,7 @@ const Heatmap = () => {
       .text('Percentage')
       .attr('text-anchor', 'middle');
 
-      legend.append('text')
+    legend.append('text')
       .attr('x', 25)
       .attr('y', 15)
       .style('font-size', '14px')  // Font size
@@ -125,7 +150,7 @@ const Heatmap = () => {
       .text('100')
       .attr('text-anchor', 'left');
 
-      legend.append('text')
+    legend.append('text')
       .attr('x', 25)
       .attr('y', legendHeight)
       .style('font-size', '14px')  // Font size
@@ -133,31 +158,31 @@ const Heatmap = () => {
       .text('0')
       .attr('text-anchor', 'left');
 
-      legend.append('text')
+    legend.append('text')
       .attr('x', 25)
-      .attr('y', legendHeight*.25+15)
+      .attr('y', legendHeight * .25 + 15)
       .style('font-size', '14px')  // Font size
       .style('font-family', 'Arial')  // Font family
       .text('75')
       .attr('text-anchor', 'left');
 
-      legend.append('text')
+    legend.append('text')
       .attr('x', 25)
-      .attr('y', legendHeight*.50+15)
+      .attr('y', legendHeight * .50 + 15)
       .style('font-size', '14px')  // Font size
       .style('font-family', 'Arial')  // Font family
       .text('50')
       .attr('text-anchor', 'left');
 
-      legend.append('text')
+    legend.append('text')
       .attr('x', 25)
-      .attr('y', legendHeight*.75+15)
+      .attr('y', legendHeight * .75 + 15)
       .style('font-size', '14px')  // Font size
       .style('font-family', 'Arial')  // Font family
       .text('25')
       .attr('text-anchor', 'left');
 
-  }, []);
+  }, [data]);
 
   return <svg ref={svgRef}></svg>;
 };

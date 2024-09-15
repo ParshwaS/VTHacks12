@@ -16,7 +16,7 @@ const formatClassName = (name: string) => {
   return name.replace(/\s+/g, '-').replace(/^\d/, 'b$&'); // Replace spaces with hyphens and add 'b' prefix if it starts with a digit
 };
 
-const LineChart1 = withAuthInfo(({ accessToken }) => {
+const LineChart1 = ({ zipcode }: { zipcode: string | null }) => {
   const svgRef = useRef<SVGSVGElement | null>(null);
   const [hoveredLegend, setHoveredLegend] = useState<string | null>(null);
 
@@ -24,7 +24,7 @@ const LineChart1 = withAuthInfo(({ accessToken }) => {
 
   useEffect(() => {
     // Fetching data from the service and setting it to GDdata
-    LineChart1Service.getLinePts().then((dummyData_) => {
+    LineChart1Service.getLinePts(zipcode).then((dummyData_) => {
       const mappedData = dummyData_.map((d: any) => ({
         date: new Date(d.month), // Convert the month string to a Date object
         "1-bedroom": d.rentals["1_bedroom"].average_rent,
@@ -34,7 +34,7 @@ const LineChart1 = withAuthInfo(({ accessToken }) => {
       }));
       setGDdata(mappedData);
     });
-  }, []);
+  }, [zipcode]);
 
   useEffect(() => {
     if (!svgRef.current || GDdata.length === 0) return;
@@ -64,13 +64,13 @@ const LineChart1 = withAuthInfo(({ accessToken }) => {
 
     // Append X axis
     svg.append('g')
-    .attr('transform', `translate(0,${height})`)
-    .call(d3.axisBottom(x).ticks(d3.timeMonth.every(1)).tickFormat(d3.timeFormat("%b %Y") as any))
-    .selectAll("text")  // Select all the text for the X-axis labels
-    .style("text-anchor", "end")  // Align the text towards the end (right side)
-    .attr("dx", "-0.8em")  // Adjust position slightly horizontally
-    .attr("dy", "0.15em")  // Adjust position slightly vertically
-    .attr("transform", "rotate(-45)");
+      .attr('transform', `translate(0,${height})`)
+      .call(d3.axisBottom(x).ticks(d3.timeMonth.every(1)).tickFormat(d3.timeFormat("%b %Y") as any))
+      .selectAll("text")  // Select all the text for the X-axis labels
+      .style("text-anchor", "end")  // Align the text towards the end (right side)
+      .attr("dx", "-0.8em")  // Adjust position slightly horizontally
+      .attr("dy", "0.15em")  // Adjust position slightly vertically
+      .attr("transform", "rotate(-45)");
     // Append Y axis
     svg.append('g')
       .call(d3.axisLeft(y));
@@ -139,6 +139,6 @@ const LineChart1 = withAuthInfo(({ accessToken }) => {
       <svg ref={svgRef}></svg>
     </div>
   );
-});
+};
 
 export default LineChart1;
