@@ -2,36 +2,42 @@
 import { withAuthInfo } from '@propelauth/react';
 import React, { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
+import LineChart1Service from '@/components/customs/services/LineChart1.service';
 
-// Average rent vs time and no of bedrooms
-
-// Define the interface for the data
 interface DataPoint {
-  "date": Date,
-  [key: string]: any;
+  date: Date;
+  "1-bedroom": number;
+  "2-bedroom": number;
+  "3-bedroom": number;
+  "4-bedroom": number;
 }
 
-// Generate dummy data for the line chart
-const generateDummyData = (): DataPoint[] => {
-  const startDate = new Date(2024, 0, 1); // Starting from January 2024
-  const months = d3.timeMonths(startDate, new Date(2024, 11, 1)); // Up to December 2024
-
-  return months.map(month => ({
-    date: month,
-    "1-bedroom": Math.random() * 200000 + 100000,
-    "2-bedroom": Math.random() * 250000 + 150000,
-    "3-bedroom": Math.random() * 300000 + 200000,
-    "4-bedroom": Math.random() * 350000 + 250000
-  }));
+const formatClassName = (name: string) => {
+  return name.replace(/\s+/g, '-').replace(/^\d/, 'b$&'); // Replace spaces with hyphens and add 'b' prefix if it starts with a digit
 };
 
 const LineChart1 = withAuthInfo(({ accessToken }) => {
   const svgRef = useRef<SVGSVGElement | null>(null);
   const [hoveredLegend, setHoveredLegend] = useState<string | null>(null);
 
+  const [GDdata, setGDdata] = useState<any[]>([]);
 
   useEffect(() => {
-    if (!svgRef.current) return;
+    // Fetching data from the service and setting it to GDdata
+    LineChart1Service.getLinePts().then((dummyData_) => {
+      const mappedData = dummyData_.map((d: any) => ({
+        date: new Date(d.month), // Convert the month string to a Date object
+        "1-bedroom": d.rentals["1_bedroom"].average_rent,
+        "2-bedroom": d.rentals["2_bedroom"].average_rent,
+        "3-bedroom": d.rentals["3_bedroom"].average_rent,
+        "4-bedroom": d.rentals["4_bedroom"].average_rent
+      }));
+      setGDdata(mappedData);
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!svgRef.current || GDdata.length === 0) return;
 
     const margin = { top: 20, right: 30, bottom: 50, left: 60 };
     const width = 800 - margin.left - margin.right;
@@ -45,30 +51,26 @@ const LineChart1 = withAuthInfo(({ accessToken }) => {
       .append('g')
       .attr('transform', `translate(${margin.left},${margin.top})`);
 
-    // Generate dummy data
-    const data = generateDummyData();
-
     // Define scales
     const x = d3.scaleTime()
-      .domain(d3.extent(data, d => d.date) as [Date, Date])
+      .domain(d3.extent(GDdata, d => d.date) as [Date, Date])
       .range([0, width]);
 
     const y = d3.scaleLinear()
-      .domain([0, 1.2*(d3.max(data, d => Math.max(
+      .domain([0, 1.2 * (d3.max(GDdata, d => Math.max(
         d["1-bedroom"], d["2-bedroom"], d["3-bedroom"], d["4-bedroom"]
       )) || 0)])
       .range([height, 0]);
 
-    // // Define the line generator
-    const line = d3.line<DataPoint>()
-      .x(d => x(d.date))
-      .y(d => y(d["value"]));
-
     // Append X axis
     svg.append('g')
-      .attr('transform', `translate(0,${height})`)
-      .call(d3.axisBottom(x).ticks(d3.timeMonth.every(1)).tickFormat(d3.timeFormat("%b %Y") as any));
-
+    .attr('transform', `translate(0,${height})`)
+    .call(d3.axisBottom(x).ticks(d3.timeMonth.every(1)).tickFormat(d3.timeFormat("%b %Y") as any))
+    .selectAll("text")  // Select all the text for the X-axis labels
+    .style("text-anchor", "end")  // Align the text towards the end (right side)
+    .attr("dx", "-0.8em")  // Adjust position slightly horizontally
+    .attr("dy", "0.15em")  // Adjust position slightly vertically
+    .attr("transform", "rotate(-45)");
     // Append Y axis
     svg.append('g')
       .call(d3.axisLeft(y));
@@ -76,12 +78,12 @@ const LineChart1 = withAuthInfo(({ accessToken }) => {
     // Define color scale
     const color = d3.scaleOrdinal(d3.schemeCategory10);
 
-    // Append lines for each bedroom type
-    console.log(Object.keys(data[0]).filter(key => key !== 'date'))
-    Object.keys(data[0]).filter(key => key !== 'date').forEach((key, i) => {
+    // Append lines for each bedroom type with properly formatted class names
+    Object.keys(GDdata[0]).filter(key => key !== 'date').forEach((key, i) => {
+      const formattedKey = formatClassName(key); // Format the class name
       svg.append('path')
-        .data([data])
-        .attr('class', 'line')
+        .data([GDdata])
+        .attr('class', `line ${formattedKey}`) // Unique and valid class for each line
         .attr('d', d3.line<DataPoint>()
           .x(d => x(d.date))
           .y(d => y(d[key] as number)))
@@ -92,27 +94,29 @@ const LineChart1 = withAuthInfo(({ accessToken }) => {
 
     // Append legend
     const legend = svg.selectAll(".legend")
-      .data(Object.keys(data[0]).filter(key => key !== 'date'))
+      .data(Object.keys(GDdata[0]).filter(key => key !== 'date'))
       .enter().append("g")
       .attr("class", "legend")
       .attr("transform", (d, i) => `translate(0,${i * 25})`)
-      .on("mouseover", function(event, d) {
+      .on("mouseover", function (event, d) {
+        const formattedKey = formatClassName(d);
         // Highlight only the hovered line
         setHoveredLegend(d as string);
 
+        // Reduce opacity of non-hovered lines
         svg.selectAll('.line')
-          .style('opacity', function(lineKey, e){ 
-            if(lineKey === d){
-              return 3;
-            }else {
-              return 0.1;
-            }
-          });
+          .style('opacity', 0.1);
+
+        // Highlight the hovered line using the formatted class name
+        svg.select(`.line.${formattedKey}`)
+          .style('opacity', 1)
+          .style('stroke-width', '4px'); // Thicken the hovered line
       })
-      .on("mouseout", function(event, d) {
-        // Reset line visibility
+      .on("mouseout", function (event, d) {
+        // Reset all lines to normal opacity and stroke width
         svg.selectAll('.line')
-          .style('opacity', 1);
+          .style('opacity', 1)
+          .style('stroke-width', '2px');
         setHoveredLegend(null);
       });
 
@@ -128,7 +132,7 @@ const LineChart1 = withAuthInfo(({ accessToken }) => {
       .attr("dy", ".35em")
       .style("text-anchor", "end")
       .text(d => d);
-  }, [hoveredLegend]); // Empty dependency array means this effect runs once after initial render
+  }, [GDdata, hoveredLegend]);
 
   return (
     <div>
