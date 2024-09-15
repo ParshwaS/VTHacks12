@@ -1,7 +1,7 @@
 import { Schema, model } from "mongoose";
 
 // Define the schema
-const qolDataSchema = new Schema({
+const qolDataPerNPASchema = new Schema({
 	NPA: {
 		type: String,
 		required: true,
@@ -14,15 +14,27 @@ const qolDataSchema = new Schema({
 		type: Number,
 		required: true,
 	},
-	medianIncome: {
+	nuisanceViolation: {
 		type: Number,
 		required: true,
 	},
-	educationLevel: {
-		type: String,
+	proximityToParks: {
+		type: Number,
 		required: true,
 	},
-	housingCost: {
+	proximityToHealthcare: {
+		type: Number,
+		required: true,
+	},
+	proximityToTransportation: {
+		type: Number,
+		required: true,
+	},
+	proximityToGroceries: {
+		type: Number,
+		required: true,
+	},
+	proximityToPharmacies: {
 		type: Number,
 		required: true,
 	},
@@ -49,4 +61,4 @@ const qolDataSchema = new Schema({
 });
 
 // Export the model
-export const QolData = model("QolData", qolDataSchema); // QolData is the name of the model
+export const QolData = model("QolData", qolDataPerNPASchema); // QolData is the name of the model
