@@ -226,13 +226,6 @@ const Portfolio = withAuthInfo(({ accessToken }) => {
             </CardContent>
           </Card>
         )}
-
-
-
-
-
-
-        
       </div>
     )
   });
