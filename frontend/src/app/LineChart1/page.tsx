@@ -39,7 +39,7 @@ const LineChart1 = withAuthInfo(({ accessToken }) => {
   useEffect(() => {
     if (!svgRef.current || GDdata.length === 0) return;
 
-    const margin = { top: 20, right: 30, bottom: 50, left: 60 };
+    const margin = { top: 20, right: 30, bottom: 65, left: 70 };
     const width = 850 - margin.left - margin.right;
     const height = 500 - margin.top - margin.bottom;
 
@@ -74,6 +74,23 @@ const LineChart1 = withAuthInfo(({ accessToken }) => {
     // Append Y axis
     svg.append('g')
       .call(d3.axisLeft(y));
+
+      svg.append('text')
+      .attr('class', 'x-axis-title')
+      .attr('text-anchor', 'middle')
+      .attr('x', width / 2)
+      .attr('y', height + margin.bottom)
+      .text('Month Year');
+
+    // Add Y axis title
+    svg.append('text')
+    .attr('class', 'y-axis-title')
+    .attr("transform", "rotate(-90)")
+    .attr("y", 0 - margin.left)
+    .attr("x", 0 - (height / 2))
+    .attr("dy", "1em")
+    .style("text-anchor", "middle")
+    .text("Avg. Rental Price");
 
     // Define color scale
     const color = d3.scaleOrdinal(d3.schemeCategory10);

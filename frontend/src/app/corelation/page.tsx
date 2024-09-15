@@ -26,8 +26,8 @@ function Correlation() {
     ];
 
     // Setup chart dimensions
-    const margin = { top: 20, right: 30, bottom: 30, left: 40 };
-    const width = 600 - margin.left - margin.right;
+    const margin = { top: 20, right: 30, bottom: 40, left: 50 };
+    const width = 700 - margin.left - margin.right;
     const height = 400 - margin.top - margin.bottom;
 
     // Create SVG element
@@ -68,6 +68,24 @@ function Correlation() {
     // Add Y axis
     svg.append('g')
       .call(d3.axisLeft(y));
+
+    svg.append('text')
+      .attr('class', 'x-axis-title')
+      .attr('text-anchor', 'middle')
+      .attr('x', width / 2)
+      .attr('y', height + margin.bottom)
+      .text('Month Year');
+
+    // Add Y axis title
+    svg.append('text')
+    .attr('class', 'y-axis-title')
+    .attr("transform", "rotate(-90)")
+    .attr("y", 0 - margin.left)
+    .attr("x", 0 - (height / 2))
+    .attr("dy", "1em")
+    .style("text-anchor", "middle")
+    .text("Percentage");
+
 
     // Add the rental price line
     svg.append('path')

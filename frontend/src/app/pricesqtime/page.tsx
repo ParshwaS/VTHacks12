@@ -22,7 +22,7 @@ const PricesByTimeChart: React.FC = () => {
   useEffect(() => {
     const svgWidth = 1000;
     const svgHeight = 400;
-    const margin = { top: 20, right: 30, bottom: 40, left: 50 };
+    const margin = { top: 20, right: 30, bottom: 65, left: 50 };
     const width = svgWidth - margin.left - margin.right;
     const height = svgHeight - margin.top - margin.bottom;
 
@@ -74,6 +74,22 @@ const PricesByTimeChart: React.FC = () => {
     // Create Y axis
     svg.append('g').call(d3.axisLeft(y));
 
+    svg.append('text')
+      .attr('class', 'x-axis-title')
+      .attr('text-anchor', 'middle')
+      .attr('x', width / 2)
+      .attr('y', height + margin.bottom)
+      .text('Month Year');
+
+    svg.append('text')
+    .attr('class', 'y-axis-title')
+    .attr("transform", "rotate(-90)")
+    .attr("y", 0 - margin.left)
+    .attr("x", 0 - (height / 2))
+    .attr("dy", "1em")
+    .style("text-anchor", "middle")
+    .text("Price per Sq. Foot");
+
     const line = d3
       .line<DataPoint>()
       .x((d) => x(d.date))
@@ -88,6 +104,41 @@ const PricesByTimeChart: React.FC = () => {
       .style('fill', 'none')
       .style('stroke', 'steelblue')
       .style('stroke-width', '2px');
+
+       // Tooltip div
+    const tooltip = d3.select(chartRef.current)
+    .append('div')
+    .attr('class', 'tooltip')
+    .style('position', 'absolute')
+    .style('visibility', 'hidden')
+    .style('background-color', 'white')
+    .style('border', '1px solid black')
+    .style('padding', '5px')
+    .style('border-radius', '5px')
+    .style('font-size', '12px');
+
+    svg.selectAll('.dot')
+      .data(data)
+      .enter().append('circle')
+      .attr('class', 'dot')
+      .attr('cx', d => x(d.date))
+      .attr('cy', d => y(d.pricePerSqFt))
+      .attr('r', 4)
+      .attr('fill', 'steelblue')
+      .on('mouseover', function(event, d) {
+        tooltip.style('visibility', 'visible')
+          .text(`Price: $${d.pricePerSqFt.toFixed(2)}`);
+        d3.select(this).attr('r', 6); // Increase point size
+      })
+      .on('mousemove', function(event) {
+        tooltip.style('top', (event.pageY - 10) + 'px')
+          .style('left', (event.pageX + 10) + 'px');
+      })
+      .on('mouseout', function() {
+        tooltip.style('visibility', 'hidden');
+        d3.select(this).attr('r', 4); // Reset point size
+      });
+
       
     // Cleanup chart on unmount
     return () => {
