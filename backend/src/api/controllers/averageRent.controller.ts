@@ -22,7 +22,7 @@ export const getAverageRentPerMonth = async (req: Request, res: Response) => {
 
 
     console.log("rentalListings");
-    console.log(rentalListings);
+    // console.log(rentalListings);
 
     // Calculate the average rent per month using the service
     const averageRentData = await calculateAverageRentPerMonth(rentalListings);
