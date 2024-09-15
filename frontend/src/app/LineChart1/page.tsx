@@ -5,7 +5,7 @@ import * as d3 from 'd3';
 import LineChart1Service from '@/components/customs/services/LineChart1.service';
 
 interface DataPoint {
-  date: Date;
+  quarter: string;
   "1-bedroom": number;
   "2-bedroom": number;
   "3-bedroom": number;
@@ -20,18 +20,19 @@ const LineChart1 = ({ zipcode }: { zipcode: string | null }) => {
   const svgRef = useRef<SVGSVGElement | null>(null);
   const [hoveredLegend, setHoveredLegend] = useState<string | null>(null);
 
-  const [GDdata, setGDdata] = useState<any[]>([]);
+  const [GDdata, setGDdata] = useState<DataPoint[]>([]);
 
   useEffect(() => {
     // Fetching data from the service and setting it to GDdata
     LineChart1Service.getLinePts(zipcode).then((dummyData_) => {
       const mappedData = dummyData_.map((d: any) => ({
-        date: new Date(d.month), // Convert the month string to a Date object
+        quarter: d.quarter, // Keep the quarter string
         "1-bedroom": d.rentals["1_bedroom"].average_rent,
         "2-bedroom": d.rentals["2_bedroom"].average_rent,
         "3-bedroom": d.rentals["3_bedroom"].average_rent,
         "4-bedroom": d.rentals["4_bedroom"].average_rent
       }));
+      console.log(mappedData);
       setGDdata(mappedData);
     });
   }, [zipcode]);
@@ -52,9 +53,10 @@ const LineChart1 = ({ zipcode }: { zipcode: string | null }) => {
       .attr('transform', `translate(${margin.left},${margin.top})`);
 
     // Define scales
-    const x = d3.scaleTime()
-      .domain(d3.extent(GDdata, d => d.date) as [Date, Date])
-      .range([0, width]);
+    const x = d3.scaleBand()
+      .domain(GDdata.map(d => d.quarter))
+      .range([0, width])
+      .padding(0.1);
 
     const y = d3.scaleLinear()
       .domain([0, 1.2 * (d3.max(GDdata, d => Math.max(
@@ -65,44 +67,45 @@ const LineChart1 = ({ zipcode }: { zipcode: string | null }) => {
     // Append X axis
     svg.append('g')
       .attr('transform', `translate(0,${height})`)
-      .call(d3.axisBottom(x).ticks(d3.timeMonth.every(1)).tickFormat(d3.timeFormat("%b %Y") as any))
+      .call(d3.axisBottom(x))
       .selectAll("text")  // Select all the text for the X-axis labels
       .style("text-anchor", "end")  // Align the text towards the end (right side)
       .attr("dx", "-0.8em")  // Adjust position slightly horizontally
       .attr("dy", "0.15em")  // Adjust position slightly vertically
       .attr("transform", "rotate(-45)");
+
     // Append Y axis
     svg.append('g')
       .call(d3.axisLeft(y));
 
-      svg.append('text')
+    svg.append('text')
       .attr('class', 'x-axis-title')
       .attr('text-anchor', 'middle')
       .attr('x', width / 2)
       .attr('y', height + margin.bottom)
-      .text('Month Year');
+      .text('Quarter');
 
     // Add Y axis title
     svg.append('text')
-    .attr('class', 'y-axis-title')
-    .attr("transform", "rotate(-90)")
-    .attr("y", 0 - margin.left)
-    .attr("x", 0 - (height / 2))
-    .attr("dy", "1em")
-    .style("text-anchor", "middle")
-    .text("Avg. Rental Price");
+      .attr('class', 'y-axis-title')
+      .attr("transform", "rotate(-90)")
+      .attr("y", 0 - margin.left)
+      .attr("x", 0 - (height / 2))
+      .attr("dy", "1em")
+      .style("text-anchor", "middle")
+      .text("Avg. Rental Price");
 
     // Define color scale
     const color = d3.scaleOrdinal(d3.schemeCategory10);
 
     // Append lines for each bedroom type with properly formatted class names
-    Object.keys(GDdata[0]).filter(key => key !== 'date').forEach((key, i) => {
+    Object.keys(GDdata[0]).filter(key => key !== 'quarter').forEach((key, i) => {
       const formattedKey = formatClassName(key); // Format the class name
       svg.append('path')
         .data([GDdata])
         .attr('class', `line ${formattedKey}`) // Unique and valid class for each line
         .attr('d', d3.line<DataPoint>()
-          .x(d => x(d.date))
+          .x(d => x(d.quarter) as number + x.bandwidth() / 2)
           .y(d => y(d[key] as number)))
         .style('fill', 'none')
         .style('stroke', color(`${i}`))
@@ -111,7 +114,7 @@ const LineChart1 = ({ zipcode }: { zipcode: string | null }) => {
 
     // Append legend
     const legend = svg.selectAll(".legend")
-      .data(Object.keys(GDdata[0]).filter(key => key !== 'date'))
+      .data(Object.keys(GDdata[0]).filter(key => key !== 'quarter'))
       .enter().append("g")
       .attr("class", "legend")
       .attr("transform", (d, i) => `translate(0,${i * 25})`)

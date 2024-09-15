@@ -4,7 +4,7 @@ class LineChart1Service {
 		return fetch(
 			process.env.NEXT_PUBLIC_BACKEND_URI! +
 				"/api/" +
-				`rentals/average-rent-per-month?zipCode=${zipCode}`
+				`rentals/average-rent-per-quarter?zipCode=${zipCode}`
 		)
 			.then((res) => res.json())
 			.then((data) => {

@@ -15,6 +15,7 @@ const Heatmap = ({ zipcode }: { zipcode: string | null }) => {
   const [data, setData] = useState<any[]>([]);
   const svgRef = useRef<SVGSVGElement | null>(null);
   const [dimensions, setDimensions] = useState({ width: 500, height: 450 });
+
   useEffect(() => {
     const updateDimensions = () => {
       if (svgRef.current) {
@@ -60,8 +61,6 @@ const Heatmap = ({ zipcode }: { zipcode: string | null }) => {
 
     const margin = { top: 30, right: 105, bottom: 80, left: 100 };
     const { width, height } = dimensions;
-    // const width = 600 - margin.left - margin.right;
-    // const height = 500 - margin.top - margin.bottom;
     d3.select(svgRef.current).select("*").remove(); // Clear previous content
 
     const svg = d3.select(svgRef.current)
@@ -86,6 +85,17 @@ const Heatmap = ({ zipcode }: { zipcode: string | null }) => {
     const color = d3.scaleSequential(d3.interpolate("white", "darkgreen"))
       .domain([0, 100]);
 
+    // Create a tooltip div
+    const tooltip = d3.select("body").append("div")
+      .attr("class", "tooltip")
+      .style("position", "absolute")
+      .style("background-color", "white")
+      .style("border", "solid")
+      .style("border-width", "1px")
+      .style("border-radius", "5px")
+      .style("padding", "10px")
+      .style("display", "none");
+
     svg.selectAll('rect')
       .data(data.flatMap(d => categories.map(cat => ({
         areaCode: d.areaCode,
@@ -97,7 +107,19 @@ const Heatmap = ({ zipcode }: { zipcode: string | null }) => {
       .attr('y', d => y(d.category)!)
       .attr('width', x.bandwidth())
       .attr('height', y.bandwidth())
-      .attr('fill', d => color(d.value));
+      .attr('fill', d => color(d.value))
+      .on("mouseover", function (event, d) {
+        tooltip.style("display", "block");
+      })
+      .on("mousemove", function (event, d) {
+        tooltip
+          .html(`Year: ${d.areaCode}<br>Category: ${d.category}<br>Value: ${d.value.toFixed(2)}%`)
+          .style("left", (event.pageX + 10) + "px")
+          .style("top", (event.pageY - 28) + "px");
+      })
+      .on("mouseout", function () {
+        tooltip.style("display", "none");
+      });
 
     svg.append('g')
       .attr('class', 'x-axis')
@@ -115,22 +137,22 @@ const Heatmap = ({ zipcode }: { zipcode: string | null }) => {
       .style('font-family', 'Arial')  // Font family
       .call(d3.axisLeft(y));
 
-      svg.append('text')
+    svg.append('text')
       .attr('class', 'x-axis-title')
       .attr('text-anchor', 'middle')
       .attr('x', width - 350)
       .attr('y', height - 60)
-      .text('Zip Codes');
+      .text('Years');
 
     // Add Y axis title
     svg.append('text')
-    .attr('class', 'y-axis-title')
-    .attr("transform", "rotate(-90)")
-    .attr("y", 0 - margin.left)
-    .attr("x", 0 - (height / 2))
-    .attr("dy", "1em")
-    .style("text-anchor", "middle")
-    .text("Proximity Categories");
+      .attr('class', 'y-axis-title')
+      .attr("transform", "rotate(-90)")
+      .attr("y", 0 - margin.left)
+      .attr("x", 0 - (height / 2))
+      .attr("dy", "1em")
+      .style("text-anchor", "middle")
+      .text("Proximity Categories");
 
     // Create a color legend
     const legendWidth = 20;

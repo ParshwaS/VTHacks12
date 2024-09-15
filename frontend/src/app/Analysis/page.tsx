@@ -32,7 +32,7 @@ const GraphsPage = () => {
         {/* Card 1: Line Chart */}
         <div className="card bg-white p-4 col-span-7 shadow-md rounded-lg">
           <h2 className="text-xl font-semibold mb-2">Rental & Sale price Growth Rate</h2>
-          <Correlation />
+          <Correlation zipcode={selectedZip} />
         </div>
         {/* Card 2: Heatmap */}
         <div className="card flex flex-col justify-center col-span-5 items-center align-middle bg-white p-4 shadow-md end-0 rounded-lg">
