@@ -1,24 +1,23 @@
 "use client"
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
+import pricesqtimeService from '@/components/customs/services/pricesqtime.service';
 
 interface DataPoint {
   date: string;
   pricePerSqFt: number;
 }
 
-const dummyData: DataPoint[] = [
-  { date: '2021-01', pricePerSqFt: 500 },
-  { date: '2021-02', pricePerSqFt: 520 },
-  { date: '2021-03', pricePerSqFt: 540 },
-  { date: '2021-04', pricePerSqFt: 530 },
-  { date: '2021-05', pricePerSqFt: 550 },
-  { date: '2021-06', pricePerSqFt: 570 },
-  { date: '2021-07', pricePerSqFt: 580 },
-];
-
 const PricesByTimeChart: React.FC = () => {
   const chartRef = useRef<HTMLDivElement | null>(null);
+  const [dummyData1, setDummyData1] = useState<any[]>([]);
+
+  useEffect(() => {
+    // Fetching data from the service
+    pricesqtimeService.getPts().then((dummyData_) => {
+      setDummyData1(dummyData_);
+    });
+  }, []);
 
   useEffect(() => {
     const svgWidth = 800;
@@ -30,9 +29,10 @@ const PricesByTimeChart: React.FC = () => {
     // Parse the dates from the data
     const parseDate = d3.timeParse('%Y-%m');
 
-    const data = dummyData.map(d => ({
-      date: parseDate(d.date) as Date,
-      pricePerSqFt: d.pricePerSqFt,
+    // Map the data to the format D3 expects
+    const data = dummyData1.map((d) => ({
+      date: parseDate(d.month) as Date,
+      pricePerSqFt: d.averageCostPerSqFt,
     }));
 
     // Create SVG element
@@ -47,13 +47,13 @@ const PricesByTimeChart: React.FC = () => {
     // Create X scale
     const x = d3
       .scaleTime()
-      .domain(d3.extent(data, d => d.date) as [Date, Date])
+      .domain(d3.extent(data, (d) => d.date) as [Date, Date])
       .range([0, width]);
 
     // Create Y scale
     const y = d3
       .scaleLinear()
-      .domain([0, d3.max(data, d => d.pricePerSqFt) as number])
+      .domain([0, d3.max(data, (d) => d.pricePerSqFt) as number])
       .nice()
       .range([height, 0]);
 
@@ -61,7 +61,12 @@ const PricesByTimeChart: React.FC = () => {
     svg
       .append('g')
       .attr('transform', `translate(0,${height})`)
-      .call(d3.axisBottom(x).ticks(d3.timeMonth.every(1)).tickFormat(d3.timeFormat('%b %Y')))
+      .call(
+        d3
+          .axisBottom(x)
+          .ticks(d3.timeMonth.every(1))
+          .tickFormat(d3.timeFormat('%b %Y'))
+      )
       .selectAll('text')
       .attr('transform', 'rotate(-45)')
       .style('text-anchor', 'end');
@@ -76,17 +81,17 @@ const PricesByTimeChart: React.FC = () => {
       .enter()
       .append('rect')
       .attr('class', 'bar')
-      .attr('x', d => x(d.date)!)
-      .attr('y', d => y(d.pricePerSqFt))
+      .attr('x', (d) => x(d.date)!)
+      .attr('y', (d) => y(d.pricePerSqFt))
       .attr('width', width / data.length - 10) // Adjust width
-      .attr('height', d => height - y(d.pricePerSqFt))
+      .attr('height', (d) => height - y(d.pricePerSqFt))
       .attr('fill', 'steelblue');
 
+    // Cleanup chart on unmount
     return () => {
-      // Cleanup chart when the component unmounts or updates
       d3.select(chartRef.current).selectAll('*').remove();
     };
-  }, []);
+  }, [dummyData1]);
 
   return <div ref={chartRef} className="chart"></div>;
 };
