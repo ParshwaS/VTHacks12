@@ -12,6 +12,15 @@ const portfolioService = {
     return response.data;
   },
 
+  getRentalPortfolio: async (accessToken: string) => {
+    const response = await axios.get(API_URL + '/get-rental-portfolio' , {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    return response.data;
+  },
+
   addProperty: async (accessToken: string, propertyData: any) => {
     const response = await axios.post(API_URL + '/add-property', propertyData, {
       headers: {

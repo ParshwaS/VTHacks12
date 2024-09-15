@@ -36,7 +36,7 @@ export class RentalService {
     });
 
     // Sort the results by month
-    monthlyAverages.sort((a, b) => (a.month > b.month ? 1 : -1));
+    monthlyAverages.sort((a, b) => (a.month < b.month ? 1 : -1));
 
     return monthlyAverages;
   }
