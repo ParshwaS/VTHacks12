@@ -6,6 +6,7 @@ import Heatmap from '@/app/Heatmap/page';
 import Correlation from '../corelation/page';
 import PricesByTimeChart from '../pricesqtime/page';
 import MapView from '@/components/MapView';
+import CrimeRate from '../crimerate/page';
 // import correlation from '@/app/corelation'; // Assume another graph component
 // import PieChart from '@/components/graphs'; // Assume another graph component
 
@@ -21,10 +22,25 @@ const GraphsPage = () => {
           <h2 className="text-xl font-semibold mb-2">Avg. Rental Price over Time</h2>
           <LineChart zipcode={selectedZip} />
         </div>
-        <div className="card bg-white p-4 col-span-4 shadow-md rounded-lg">
+        <div className="card flex flex-col items-center bg-white p-4 col-span-4 shadow-md rounded-lg">
           <h2 className="text-xl font-semibold mb-2">Search by Zipcode</h2>
           <MapView setSelectedZip={setSelectedZip} selectedZip={selectedZip} />
           <p></p>
+        </div>
+      </div>
+
+      
+      <div className="flex my-4 gap-4 grid-cols-12">
+         {/* Card 2: Heatmap */}
+         <div className="card flex flex-col justify-center items-center align-middle bg-white p-4 shadow-md end-0 rounded-lg">
+          <h2 className="text-xl font-semibold mb-2">Crime Rate per 100 Housings over Time</h2>
+          <CrimeRate/>
+        </div>
+        
+        {/* Card 2: Heatmap */}
+        <div className="card flex flex-col justify-center items-center align-middle bg-white p-4 shadow-md end-0 rounded-lg">
+          <h2 className="text-xl font-semibold mb-2">Price per Square Feet over Time</h2>
+          <PricesByTimeChart />
         </div>
       </div>
 
@@ -41,13 +57,6 @@ const GraphsPage = () => {
         </div>
       </div>
 
-      <div className="flex my-4 gap-4">
-        {/* Card 2: Heatmap */}
-        <div className="card flex flex-col justify-center items-center align-middle bg-white p-4 shadow-md end-0 rounded-lg">
-          <h2 className="text-xl font-semibold mb-2">Price per Square Feet over Time</h2>
-          <PricesByTimeChart />
-        </div>
-      </div>
     </div>
   );
 };

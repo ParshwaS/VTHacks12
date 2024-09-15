@@ -14,8 +14,8 @@ const data = [
 const Heatmap = ({ zipcode }: { zipcode: string | null }) => {
   const [data, setData] = useState<any[]>([]);
   const svgRef = useRef<SVGSVGElement | null>(null);
-  const [dimensions, setDimensions] = useState({ width: 500, height: 450 });
 
+  const [dimensions, setDimensions] = useState({ width: 500, height: 430 });
   useEffect(() => {
     const updateDimensions = () => {
       if (svgRef.current) {
@@ -59,7 +59,7 @@ const Heatmap = ({ zipcode }: { zipcode: string | null }) => {
   useEffect(() => {
     if (!svgRef.current) return;
 
-    const margin = { top: 30, right: 105, bottom: 80, left: 100 };
+    const margin = { top: 30, right: 105, bottom: 75, left: 100 };
     const { width, height } = dimensions;
     d3.select(svgRef.current).select("*").remove(); // Clear previous content
 
