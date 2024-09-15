@@ -11,8 +11,7 @@ interface ZipCodeProperties {
 	zip: string;
 }
 
-const MapView = () => {
-	const [selectedZip, setSelectedZip] = useState<string | null>(null);
+const MapView = ({ setSelectedZip, selectedZip }: { setSelectedZip: Function, selectedZip: string | null }) => {
 	const [selectedLayer, setSelectedLayer] = useState<L.Layer | null>(null);
 
 	const defaultStyle = {

@@ -1,29 +1,28 @@
 "use client";
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import * as d3 from 'd3';
+import corelationServices from '@/components/customs/services/corelation.services';
 
 interface DataPoint {
-  date: string;
+  quarter: string;
   rentalPriceChange: number;
   salePriceChange: number;
 }
 
-function Correlation() {
+function Correlation({ zipcode }: { zipcode: string | null }) {
+  
+  const [data, setDummyData] = useState<DataPoint[]>([]);
+
+  useEffect(() => {
+    corelationServices.getcorelation(zipcode).then((dumy_data: any) => {
+      setDummyData(dumy_data);
+      console.log(dumy_data);
+    });
+  }, [zipcode]);
+
   useEffect(() => {
     // Clear the previous chart
     d3.select('.chart').selectAll('*').remove();
-
-    // Sample data (Month/Year and corresponding rental and sale price changes)
-    const data: DataPoint[] = [
-      { date: '2023-01', rentalPriceChange: +2.5, salePriceChange: -3.0 },
-      { date: '2023-02', rentalPriceChange: +3.0, salePriceChange: +3.5 },
-      { date: '2023-03', rentalPriceChange: +2.8, salePriceChange: -3.1 },
-      { date: '2023-04', rentalPriceChange: +4.0, salePriceChange: -4.5 },
-      { date: '2023-05', rentalPriceChange: +3.5, salePriceChange: +4.0 },
-      { date: '2023-06', rentalPriceChange: -3.8, salePriceChange: +4.2 },
-      { date: '2023-07', rentalPriceChange: -4.5, salePriceChange: +4.8 },
-      { date: '2023-08', rentalPriceChange: -4.2, salePriceChange: +5.0 },
-    ];
 
     // Setup chart dimensions
     const margin = { top: 20, right: 30, bottom: 40, left: 50 };
@@ -38,32 +37,30 @@ function Correlation() {
       .append('g')
       .attr('transform', `translate(${margin.left},${margin.top})`);
 
-    // Parse the date and setup scales
-    const parseDate = d3.timeParse('%Y-%m');
-    const x = d3.scaleTime()
-      .domain(d3.extent(data, d => parseDate(d.date) as Date) as [Date, Date])
-      .range([0, width]);
+    // Setup scales
+    const x = d3.scaleBand()
+      .domain(data.map(d => d.quarter))
+      .range([0, width])
+      .padding(0.1);
 
-    // Use the maximum absolute value to set the y scale domain
     const y = d3.scaleLinear()
-      // .domain([0, d3.max(data, d => Math.max(Math.abs(d.rentalPriceChange), Math.abs(d.salePriceChange))) as number])
-      .domain([-7, 7])
+      .domain([-150, 150])
       .range([height, 0]);
 
-    // Define the line generator for rental price changes (use absolute values for plotting)
+    // Define the line generator for rental price changes
     const rentalLine = d3.line<DataPoint>()
-      .x(d => x(parseDate(d.date) as Date) as number)
+      .x(d => x(d.quarter) as number + x.bandwidth() / 2)
       .y(d => y(d.rentalPriceChange) as number);
 
-    // Define the line generator for sale price changes (use absolute values for plotting)
+    // Define the line generator for sale price changes
     const saleLine = d3.line<DataPoint>()
-      .x(d => x(parseDate(d.date) as Date) as number)
+      .x(d => x(d.quarter) as number + x.bandwidth() / 2)
       .y(d => y(d.salePriceChange) as number);
 
     // Add X axis
     svg.append('g')
       .attr('transform', `translate(0,${height})`)
-      .call(d3.axisBottom(x).ticks(6));
+      .call(d3.axisBottom(x));
 
     // Add Y axis
     svg.append('g')
@@ -74,18 +71,17 @@ function Correlation() {
       .attr('text-anchor', 'middle')
       .attr('x', width / 2)
       .attr('y', height + margin.bottom)
-      .text('Month Year');
+      .text('Quarter');
 
     // Add Y axis title
     svg.append('text')
-    .attr('class', 'y-axis-title')
-    .attr("transform", "rotate(-90)")
-    .attr("y", 0 - margin.left)
-    .attr("x", 0 - (height / 2))
-    .attr("dy", "1em")
-    .style("text-anchor", "middle")
-    .text("Percentage");
-
+      .attr('class', 'y-axis-title')
+      .attr("transform", "rotate(-90)")
+      .attr("y", 0 - margin.left)
+      .attr("x", 0 - (height / 2))
+      .attr("dy", "1em")
+      .style("text-anchor", "middle")
+      .text("Percentage");
 
     // Add the rental price line
     svg.append('path')
@@ -121,63 +117,56 @@ function Correlation() {
     svg.selectAll('.rental-dot')
       .data(data)
       .enter().append('circle')
-      .attr('cx', d => x(parseDate(d.date) as Date) as number)
-      .attr('cy', d => y(d.rentalPriceChange) as number) // Plot with absolute values
+      .attr('cx', d => x(d.quarter) as number + x.bandwidth() / 2)
+      .attr('cy', d => y(d.rentalPriceChange) as number)
       .attr('r', 4)
       .attr('fill', d => d.rentalPriceChange >= 0 ? 'green' : 'red')
       .on('mouseover', function (event, d) {
-        // Show the tooltip with rental price change and change text color based on value
         tooltip.style('visibility', 'visible')
           .text(`Rental: ${d.rentalPriceChange}%`)
           .style('color', getColorForValue(d.rentalPriceChange));
         d3.select(this)
-          .attr('fill', 'blue') // Highlight the point
-          .attr('r', 6); // Increase point size
+          .attr('fill', 'blue')
+          .attr('r', 6);
       })
       .on('mousemove', function (event) {
-        // Move the tooltip with the cursor
         tooltip.style('top', (event.pageY - 30) + 'px')
           .style('left', (event.pageX + 5) + 'px');
       })
-      .on('mouseout', function (event,d) {
-        // Hide the tooltip when mouse leaves
+      .on('mouseout', function (event, d) {
         tooltip.style('visibility', 'hidden');
         d3.select(this)
-        .attr('fill', d => d.rentalPriceChange >= 0 ? 'green' : 'red')
-          .attr('r', 4); // Reset point size
+          .attr('fill', d => d.rentalPriceChange >= 0 ? 'green' : 'red')
+          .attr('r', 4);
       });
 
-   // Add points for sale price
-svg.selectAll('.sale-dot')
-  .data(data)
-  .enter().append('circle')
-  .attr('cx', d => x(parseDate(d.date) as Date) as number)
-  .attr('cy', d => y(d.salePriceChange) as number)  // Take the absolute value for plotting
-  .attr('r', 4)
-  .attr('fill', d => d.salePriceChange >= 0 ? 'green' : 'red')  // Color based on positive (green) or negative (red)
-  .on('mouseover', function (event, d) {
-    // Show the tooltip with rental and sale price change
-    tooltip.style('visibility', 'visible')
-      .text(`Sale: ${d.salePriceChange}%`)
-      .style('color', d.salePriceChange >= 0 ? 'green' : 'red');  // Tooltip text color matches the change
-    d3.select(this)
-      .attr('fill', 'blue') // Highlight the point
-      .attr('r', 6); // Increase point size
-  })
-  .on('mousemove', function (event) {
-    // Move the tooltip with the cursor
-    tooltip.style('top', (event.pageY - 30) + 'px')
-      .style('left', (event.pageX + 5) + 'px');
-  })
-  .on('mouseout', function (event, d) {
-    // Hide the tooltip when mouse leaves
-    tooltip.style('visibility', 'hidden');
-    d3.select(this)
-    .attr('fill', d => d.salePriceChange >= 0 ? 'green' : 'red') // Reset point color based on change
-      .attr('r', 4); // Reset point size
-  });
+    svg.selectAll('.sale-dot')
+      .data(data)
+      .enter().append('circle')
+      .attr('cx', d => x(d.quarter) as number + x.bandwidth() / 2)
+      .attr('cy', d => y(d.salePriceChange) as number)
+      .attr('r', 4)
+      .attr('fill', d => d.salePriceChange >= 0 ? 'green' : 'red')
+      .on('mouseover', function (event, d) {
+        tooltip.style('visibility', 'visible')
+          .text(`Sale: ${d.salePriceChange}%`)
+          .style('color', getColorForValue(d.salePriceChange));
+        d3.select(this)
+          .attr('fill', 'blue')
+          .attr('r', 6);
+      })
+      .on('mousemove', function (event) {
+        tooltip.style('top', (event.pageY - 30) + 'px')
+          .style('left', (event.pageX + 5) + 'px');
+      })
+      .on('mouseout', function (event, d) {
+        tooltip.style('visibility', 'hidden');
+        d3.select(this)
+          .attr('fill', d => d.salePriceChange >= 0 ? 'green' : 'red')
+          .attr('r', 4);
+      });
 
-  }, []);
+  }, [data]);
 
   return (
     <div className="chart"></div>
