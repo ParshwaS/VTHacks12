@@ -3,6 +3,8 @@ import { fetchAndStoreRentalListings, getRentalListings } from '../controllers/r
 import { getAveragePricePerSqft } from '../controllers/getAveragePricePerSqft';
 import { getAverageRentPerMonth } from '../controllers/averageRent.controller';
 import { getValueEstimate } from '../controllers/valueEstimate.controller';
+import { getQuarterlyChange } from '../controllers/quarterlyChange.controller';
+
 
 
 
@@ -23,5 +25,9 @@ router.get('/average-rent-per-month', getAverageRentPerMonth);
 
 // Route to get property value estimate
 router.get('/value-estimate', getValueEstimate);
+
+
+// Route to get quarterly change in sales and rent values
+router.get('/quarterly-change', getQuarterlyChange);
 
 export default router;
