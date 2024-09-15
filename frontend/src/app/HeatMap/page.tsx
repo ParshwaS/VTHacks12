@@ -14,7 +14,7 @@ const data = [
 const Heatmap = ({ zipcode }: { zipcode: string | null }) => {
   const [data, setData] = useState<any[]>([]);
   const svgRef = useRef<SVGSVGElement | null>(null);
-  const [dimensions, setDimensions] = useState({ width: 500, height: 400 });
+  const [dimensions, setDimensions] = useState({ width: 500, height: 450 });
   useEffect(() => {
     const updateDimensions = () => {
       if (svgRef.current) {
@@ -58,7 +58,7 @@ const Heatmap = ({ zipcode }: { zipcode: string | null }) => {
   useEffect(() => {
     if (!svgRef.current) return;
 
-    const margin = { top: 30, right: 105, bottom: 70, left: 95 };
+    const margin = { top: 30, right: 105, bottom: 80, left: 100 };
     const { width, height } = dimensions;
     // const width = 600 - margin.left - margin.right;
     // const height = 500 - margin.top - margin.bottom;
@@ -114,6 +114,23 @@ const Heatmap = ({ zipcode }: { zipcode: string | null }) => {
       .style('font-size', '14px')  // Font size
       .style('font-family', 'Arial')  // Font family
       .call(d3.axisLeft(y));
+
+      svg.append('text')
+      .attr('class', 'x-axis-title')
+      .attr('text-anchor', 'middle')
+      .attr('x', width - 350)
+      .attr('y', height - 60)
+      .text('Zip Codes');
+
+    // Add Y axis title
+    svg.append('text')
+    .attr('class', 'y-axis-title')
+    .attr("transform", "rotate(-90)")
+    .attr("y", 0 - margin.left)
+    .attr("x", 0 - (height / 2))
+    .attr("dy", "1em")
+    .style("text-anchor", "middle")
+    .text("Proximity Categories");
 
     // Create a color legend
     const legendWidth = 20;
