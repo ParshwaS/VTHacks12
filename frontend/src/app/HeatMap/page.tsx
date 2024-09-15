@@ -15,18 +15,6 @@ const Heatmap = () => {
   const svgRef = useRef<SVGSVGElement | null>(null);
   const [dimensions, setDimensions] = useState({ width: 500, height: 400 });
   useEffect(() => {
-    // // Function to update dimensions on resize
-    // const handleResize = () => {
-    //   const containerWidth = window.innerWidth * 0.6;  // 80% of the window width
-    //   const containerHeight = window.innerHeight * 0.5; // 70% of the window height
-    //   setDimensions({ width: containerWidth, height: containerHeight });
-    // };
-
-    // // Set initial dimensions
-    // handleResize();
-
-    // // Add event listener for window resize
-    // window.addEventListener('resize', handleResize);
     const updateDimensions = () => {
       if (svgRef.current) {
         const parent = svgRef.current.parentElement;

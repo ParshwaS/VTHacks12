@@ -66,7 +66,7 @@ const MapView = () => {
 
 	return (
 		<div>
-			<MapContainer center={[35.2271, -80.8431]} zoom={12} style={{ height: '70vh', width: '30%' }}>
+			<MapContainer center={[35.2271, -80.8431]} zoom={12} style={{ height: '70vh', width: '100%' }}>
 				<TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
 				<GeoJSON data={zipCodeData as FeatureCollection} onEachFeature={onEachZipCode} style={defaultStyle} />
 			</MapContainer>
