@@ -40,8 +40,8 @@ const LineChart1 = withAuthInfo(({ accessToken }) => {
     if (!svgRef.current || GDdata.length === 0) return;
 
     const margin = { top: 20, right: 30, bottom: 65, left: 70 };
-    const width = 850 - margin.left - margin.right;
-    const height = 500 - margin.top - margin.bottom;
+    const width = 800 - margin.left - margin.right;
+    const height = 400 - margin.top - margin.bottom;
 
     // Set up the SVG container
     d3.select(svgRef.current).select("*").remove();

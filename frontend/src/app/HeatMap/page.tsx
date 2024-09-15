@@ -13,7 +13,7 @@ const data = [
 
 const Heatmap = () => {
   const svgRef = useRef<SVGSVGElement | null>(null);
-  const [dimensions, setDimensions] = useState({ width: 500, height: 450 });
+  const [dimensions, setDimensions] = useState({ width: 500, height: 430 });
   useEffect(() => {
     const updateDimensions = () => {
       if (svgRef.current) {
@@ -37,7 +37,7 @@ const Heatmap = () => {
   useEffect(() => {
     if (!svgRef.current) return;
 
-    const margin = { top: 30, right: 105, bottom: 80, left: 100 };
+    const margin = { top: 30, right: 105, bottom: 75, left: 100 };
     const { width, height } = dimensions;
     // const width = 600 - margin.left - margin.right;
     // const height = 500 - margin.top - margin.bottom;
