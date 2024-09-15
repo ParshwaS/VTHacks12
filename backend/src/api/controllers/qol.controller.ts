@@ -69,6 +69,23 @@ class QualityOfLifeController {
 				},
 			},
 			{
+				$project: {
+                    _id: 0,
+					year: "$_id.year",
+					sumProximityToParks: 1,
+					sumProximityToHealthcare: 1,
+					sumProximityToTransportation: 1,
+					sumProximityToGroceries: 1,
+					sumProximityToPharmacies: 1,
+					count: 1,
+					nullProximityToParks: 1,
+					nullProximityToHealthcare: 1,
+					nullProximityToTransportation: 1,
+					nullProximityToGroceries: 1,
+					nullProximityToPharmacies: 1,
+				},
+			},
+			{
 				$sort: {
 					year: 1,
 				},
@@ -115,81 +132,120 @@ class QualityOfLifeController {
 					delete item.nullProximityToGroceries;
 					delete item.nullProximityToPharmacies;
 				});
+                // Populate null values with average
+                data.forEach((item) => {
+                    item.avgProximityToParks =
+                        item.avgProximityToParks || 0;
+                    item.avgProximityToHealthcare =
+                        item.avgProximityToHealthcare || 0;
+                    item.avgProximityToTransportation =
+                        item.avgProximityToTransportation || 0;
+                    item.avgProximityToGroceries =
+                        item.avgProximityToGroceries || 0;
+                    item.avgProximityToPharmacies =
+                        item.avgProximityToPharmacies || 0;
+                });
 				res.status(200).json(data);
 			});
 		// }
 	}
 
 	public async crimesData(req: Request, res: Response, next: NextFunction) {
-        let aggregateQuery: any = [
-            {
-                $group: {
-                    _id: {
-                        year: "$dataYear",
-                    },
-                    count: { $sum: 1 },
-                    sumViolentCrime: { $sum: "$violentCrime" },
-                    sumPropertyCrime: { $sum: "$propertyCrime" },
-                    sumNuisanceViolation: { $sum: "$nuisanceViolation" },
-                    nullViolentCrime: {
-                        $sum: {
-                            $cond: [{ $eq: ["$violentCrime", null] }, 1, 0],
-                        },
-                    },
-                    nullPropertyCrime: {
-                        $sum: {
-                            $cond: [{ $eq: ["$propertyCrime", null] }, 1, 0],
-                        },
-                    },
-                    nullNuisanceViolation: {
-                        $sum: {
-                            $cond: [{ $eq: ["$nuisanceViolation", null] }, 1, 0],
-                        },
-                    },
-                },
-            },
-            {
-                $sort: {
-                    year: 1,
-                },
-            },
-        ];
+		let aggregateQuery: any = [
+			{
+				$group: {
+					_id: {
+						year: "$dataYear",
+					},
+					count: { $sum: 1 },
+					sumViolentCrime: { $sum: "$violentCrime" },
+					sumPropertyCrime: { $sum: "$propertyCrime" },
+					sumNuisanceViolation: { $sum: "$nuisanceViolation" },
+					nullViolentCrime: {
+						$sum: {
+							$cond: [{ $eq: ["$violentCrime", null] }, 1, 0],
+						},
+					},
+					nullPropertyCrime: {
+						$sum: {
+							$cond: [{ $eq: ["$propertyCrime", null] }, 1, 0],
+						},
+					},
+					nullNuisanceViolation: {
+						$sum: {
+							$cond: [
+								{ $eq: ["$nuisanceViolation", null] },
+								1,
+								0,
+							],
+						},
+					},
+				},
+			},
+			{
+				$project: {
+                    _id: 0,
+					year: "$_id.year",
+					sumViolentCrime: 1,
+					sumPropertyCrime: 1,
+					sumNuisanceViolation: 1,
+					count: 1,
+					nullViolentCrime: 1,
+					nullPropertyCrime: 1,
+					nullNuisanceViolation: 1,
+				},
+			},
+			{
+				$sort: {
+					year: 1,
+				},
+			},
+		];
 
-        if (req.query.zip) {
-            aggregateQuery = [
-                {
-                    $match: {
-                        zipCode: parseInt(req.query.zip as string),
-                    },
-                },
-                ...aggregateQuery,
-            ];
-        }
+		if (req.query.zip) {
+			aggregateQuery = [
+				{
+					$match: {
+						zipCode: parseInt(req.query.zip as string),
+					},
+				},
+				...aggregateQuery,
+			];
+		}
 
-        return QolData.aggregate(aggregateQuery)
-            .exec()
-            .then((data) => {
+		return QolData.aggregate(aggregateQuery)
+			.exec()
+			.then((data) => {
+				data.forEach((item) => {
+					item.avgViolentCrime =
+						item.sumViolentCrime /
+						(item.count - item.nullViolentCrime);
+					item.avgPropertyCrime =
+						item.sumPropertyCrime /
+						(item.count - item.nullPropertyCrime);
+					item.avgNuisanceViolation =
+						item.sumNuisanceViolation /
+						(item.count - item.nullNuisanceViolation);
+					delete item.sumViolentCrime;
+					delete item.sumPropertyCrime;
+					delete item.sumNuisanceViolation;
+					delete item.count;
+					delete item.nullViolentCrime;
+					delete item.nullPropertyCrime;
+					delete item.nullNuisanceViolation;
+				});
+                // Populate null values with average
                 data.forEach((item) => {
                     item.avgViolentCrime =
-                        item.sumViolentCrime /
-                        (item.count - item.nullViolentCrime);
+                        item.avgViolentCrime || 0;
                     item.avgPropertyCrime =
-                        item.sumPropertyCrime /
-                        (item.count - item.nullPropertyCrime);
+                        item.avgPropertyCrime || 0;
                     item.avgNuisanceViolation =
-                        item.sumNuisanceViolation /
-                        (item.count - item.nullNuisanceViolation);
-                    delete item.sumViolentCrime;
-                    delete item.sumPropertyCrime;
-                    delete item.sumNuisanceViolation;
-                    delete item.count;
-                    delete item.nullViolentCrime;
-                    delete item.nullPropertyCrime;
-                    delete item.nullNuisanceViolation;
+                        item.avgNuisanceViolation || 0;
                 });
-                res.status(200).json(data);
-            });
-    }
+				res.status(200).json(data);
+			});
+	}
 }
 
 export default new QualityOfLifeController();
