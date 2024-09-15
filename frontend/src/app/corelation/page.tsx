@@ -1,6 +1,7 @@
 "use client";
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import * as d3 from 'd3';
+import corelationServices from '@/components/customs/services/corelation.services';
 
 interface DataPoint {
   date: string;
@@ -9,6 +10,16 @@ interface DataPoint {
 }
 
 function Correlation() {
+  
+  const [dummy_data, setDummyData] = useState<any[]>([]);
+
+    useEffect(() => {
+        corelationServices.getcorelation().then((dumy_data) => {
+          console.log(dumy_data)
+          setDummyData(dumy_data);
+        });
+    }, []);
+
   useEffect(() => {
     // Clear the previous chart
     d3.select('.chart').selectAll('*').remove();
@@ -24,6 +35,9 @@ function Correlation() {
       { date: '2023-07', rentalPriceChange: -4.5, salePriceChange: +4.8 },
       { date: '2023-08', rentalPriceChange: -4.2, salePriceChange: +5.0 },
     ];
+
+
+    
 
     // Setup chart dimensions
     const margin = { top: 20, right: 30, bottom: 30, left: 40 };
