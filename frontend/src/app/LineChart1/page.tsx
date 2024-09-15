@@ -18,10 +18,10 @@ const generateDummyData = (): DataPoint[] => {
 
   return months.map(month => ({
     date: month,
-    "1-bedroom": 200000 + 100000,
-    "3-bedroom": 300000 + 200000,
-    "4-bedroom": 350000 + 250000,
-    "2-bedroom": 250000 + 150000,
+    "1-bedroom": Math.random() * 200000 + 100000,
+    "2-bedroom": Math.random() * 250000 + 150000,
+    "3-bedroom": Math.random() * 300000 + 200000,
+    "4-bedroom": Math.random() * 350000 + 250000
   }));
 };
 
@@ -87,7 +87,6 @@ const LineChart1 = withAuthInfo(({ accessToken }) => {
           .y(d => y(d[key] as number)))
         .style('fill', 'none')
         .style('stroke', color(`${i}`))
-        .style('opacity', 0.7)
         .style('stroke-width', '2px');
     });
 
