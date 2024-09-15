@@ -8,16 +8,16 @@ interface DataPoint {
   pricePerSqFt: number;
 }
 
-const PricesByTimeChart: React.FC = () => {
+const PricesByTimeChart = ({ zipcode }: { zipcode: string | null }) => {
   const chartRef = useRef<HTMLDivElement | null>(null);
   const [dummyData1, setDummyData1] = useState<any[]>([]);
 
   useEffect(() => {
     // Fetching data from the service
-    pricesqtimeService.getPts().then((dummyData_) => {
+    pricesqtimeService.getPts(zipcode).then((dummyData_) => {
       setDummyData1(dummyData_);
     });
-  }, []);
+  }, [zipcode]);
 
   useEffect(() => {
     const svgWidth = 1000;
@@ -82,13 +82,13 @@ const PricesByTimeChart: React.FC = () => {
       .text('Month Year');
 
     svg.append('text')
-    .attr('class', 'y-axis-title')
-    .attr("transform", "rotate(-90)")
-    .attr("y", 0 - margin.left)
-    .attr("x", 0 - (height / 2))
-    .attr("dy", "1em")
-    .style("text-anchor", "middle")
-    .text("Price per Sq. Foot");
+      .attr('class', 'y-axis-title')
+      .attr("transform", "rotate(-90)")
+      .attr("y", 0 - margin.left)
+      .attr("x", 0 - (height / 2))
+      .attr("dy", "1em")
+      .style("text-anchor", "middle")
+      .text("Price per Sq. Foot");
 
     const line = d3
       .line<DataPoint>()
@@ -105,17 +105,17 @@ const PricesByTimeChart: React.FC = () => {
       .style('stroke', 'steelblue')
       .style('stroke-width', '2px');
 
-       // Tooltip div
+    // Tooltip div
     const tooltip = d3.select(chartRef.current)
-    .append('div')
-    .attr('class', 'tooltip')
-    .style('position', 'absolute')
-    .style('visibility', 'hidden')
-    .style('background-color', 'white')
-    .style('border', '1px solid black')
-    .style('padding', '5px')
-    .style('border-radius', '5px')
-    .style('font-size', '12px');
+      .append('div')
+      .attr('class', 'tooltip')
+      .style('position', 'absolute')
+      .style('visibility', 'hidden')
+      .style('background-color', 'white')
+      .style('border', '1px solid black')
+      .style('padding', '5px')
+      .style('border-radius', '5px')
+      .style('font-size', '12px');
 
     svg.selectAll('.dot')
       .data(data)
@@ -125,21 +125,21 @@ const PricesByTimeChart: React.FC = () => {
       .attr('cy', d => y(d.pricePerSqFt))
       .attr('r', 4)
       .attr('fill', 'steelblue')
-      .on('mouseover', function(event, d) {
+      .on('mouseover', function (event, d) {
         tooltip.style('visibility', 'visible')
           .text(`Price: $${d.pricePerSqFt.toFixed(2)}`);
         d3.select(this).attr('r', 6); // Increase point size
       })
-      .on('mousemove', function(event) {
+      .on('mousemove', function (event) {
         tooltip.style('top', (event.pageY - 10) + 'px')
           .style('left', (event.pageX + 10) + 'px');
       })
-      .on('mouseout', function() {
+      .on('mouseout', function () {
         tooltip.style('visibility', 'hidden');
         d3.select(this).attr('r', 4); // Reset point size
       });
 
-      
+
     // Cleanup chart on unmount
     return () => {
       d3.select(chartRef.current).selectAll('*').remove();

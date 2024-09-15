@@ -45,7 +45,7 @@ const GraphsPage = () => {
         {/* Card 2: Heatmap */}
         <div className="card flex flex-col justify-center items-center align-middle bg-white p-4 shadow-md end-0 rounded-lg">
           <h2 className="text-xl font-semibold mb-2">Price per Square Feet over Time</h2>
-          <PricesByTimeChart />
+          <PricesByTimeChart zipcode={selectedZip} />
         </div>
       </div>
     </div>
