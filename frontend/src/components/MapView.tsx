@@ -4,7 +4,7 @@ import { MapContainer, TileLayer, GeoJSON } from "react-leaflet";
 import L from "leaflet";
 import { useState, useEffect } from "react";
 import "leaflet/dist/leaflet.css";
-import zipCodeData from "../../public/zipcode"; // Ensure GeoJSON data is in public folder
+import zipCodeData from "../../public/zipcode.json"; // Ensure GeoJSON data is in public folder
 import { Feature, FeatureCollection } from 'geojson'; // GeoJSON types
 
 interface ZipCodeProperties {

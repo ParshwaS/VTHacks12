@@ -70,7 +70,7 @@ class QualityOfLifeController {
 			},
 			{
 				$project: {
-                    _id: 0,
+					_id: 0,
 					year: "$_id.year",
 					sumProximityToParks: 1,
 					sumProximityToHealthcare: 1,
@@ -91,7 +91,7 @@ class QualityOfLifeController {
 				},
 			},
 		];
-		if (req.query.zip) {
+		if (req.query.zip && req.query.zip !== "" && req.query.zip !== "null") {
 			aggregateQuery = [
 				{
 					$match: {
@@ -132,19 +132,18 @@ class QualityOfLifeController {
 					delete item.nullProximityToGroceries;
 					delete item.nullProximityToPharmacies;
 				});
-                // Populate null values with average
-                data.forEach((item) => {
-                    item.avgProximityToParks =
-                        item.avgProximityToParks || 0;
-                    item.avgProximityToHealthcare =
-                        item.avgProximityToHealthcare || 0;
-                    item.avgProximityToTransportation =
-                        item.avgProximityToTransportation || 0;
-                    item.avgProximityToGroceries =
-                        item.avgProximityToGroceries || 0;
-                    item.avgProximityToPharmacies =
-                        item.avgProximityToPharmacies || 0;
-                });
+				// Populate null values with average
+				data.forEach((item) => {
+					item.avgProximityToParks = item.avgProximityToParks || 0;
+					item.avgProximityToHealthcare =
+						item.avgProximityToHealthcare || 0;
+					item.avgProximityToTransportation =
+						item.avgProximityToTransportation || 0;
+					item.avgProximityToGroceries =
+						item.avgProximityToGroceries || 0;
+					item.avgProximityToPharmacies =
+						item.avgProximityToPharmacies || 0;
+				});
 				res.status(200).json(data);
 			});
 		// }
@@ -184,7 +183,7 @@ class QualityOfLifeController {
 			},
 			{
 				$project: {
-                    _id: 0,
+					_id: 0,
 					year: "$_id.year",
 					sumViolentCrime: 1,
 					sumPropertyCrime: 1,
@@ -202,7 +201,7 @@ class QualityOfLifeController {
 			},
 		];
 
-		if (req.query.zip) {
+		if (req.query.zip && req.query.zip !== "" && req.query.zip !== "null") {
 			aggregateQuery = [
 				{
 					$match: {
@@ -234,15 +233,12 @@ class QualityOfLifeController {
 					delete item.nullPropertyCrime;
 					delete item.nullNuisanceViolation;
 				});
-                // Populate null values with average
-                data.forEach((item) => {
-                    item.avgViolentCrime =
-                        item.avgViolentCrime || 0;
-                    item.avgPropertyCrime =
-                        item.avgPropertyCrime || 0;
-                    item.avgNuisanceViolation =
-                        item.avgNuisanceViolation || 0;
-                });
+				// Populate null values with average
+				data.forEach((item) => {
+					item.avgViolentCrime = item.avgViolentCrime || 0;
+					item.avgPropertyCrime = item.avgPropertyCrime || 0;
+					item.avgNuisanceViolation = item.avgNuisanceViolation || 0;
+				});
 				res.status(200).json(data);
 			});
 	}
