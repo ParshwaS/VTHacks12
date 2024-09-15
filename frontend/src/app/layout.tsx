@@ -7,6 +7,7 @@ const inter = Inter({ subsets: ["latin"] });
 import { ThemeProvider } from "@/components/themeProvider";
 import Navbar from "@/components/customs/navbar";
 import { AuthProvider } from "@propelauth/react";
+import Footer from "@/components/customs/footer";
 
 export default function RootLayout({
 	children,
@@ -27,6 +28,7 @@ export default function RootLayout({
 					>
 						<Navbar />
 						{children}
+						<Footer />
 					</ThemeProvider>
 				</AuthProvider>
 			</body>
