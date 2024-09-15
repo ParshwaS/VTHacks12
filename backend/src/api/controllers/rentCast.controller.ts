@@ -24,10 +24,10 @@ export const fetchAndStoreRentalListings = async (req: Request, res: Response) =
     // Store data in the database
     await storeRentalListingsInDB(rentalListings);
 
-    res.status(200).json({ message: 'Rental listings fetched and stored successfully' });
+    res.status(200).json({ message: 'Rental listings fetched and stored successfully', data: rentalListings });
   } catch (error: any) {
-    console.log(error);
-    res.status(500).json({ message: error.message });
+   // Handle the error and return the error message to the user
+   res.status(400).json({ message: error.message });
   }
 };
 
