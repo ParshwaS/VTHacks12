@@ -1,11 +1,9 @@
 import { Router } from 'express';
 import { fetchAndStoreRentalListings, getRentalListings } from '../controllers/rentCast.controller';
 import { getAveragePricePerSqft } from '../controllers/getAveragePricePerSqft';
-import { getAverageRentPerMonth } from '../controllers/averageRent.controller';
 import { getValueEstimate } from '../controllers/valueEstimate.controller';
 import { getQuarterlyChange } from '../controllers/quarterlyChange.controller';
-
-
+import { getAverageRentPerQuarter } from '../controllers/averageRent.controller';
 
 
 const router = Router();
@@ -21,7 +19,7 @@ router.get('/', getRentalListings);
 router.get('/average-price-per-sqft', getAveragePricePerSqft);
 
 // Define the route to get average rent per month
-router.get('/average-rent-per-month', getAverageRentPerMonth);
+router.get('/average-rent-per-quarter', getAverageRentPerQuarter);
 
 // Route to get property value estimate
 router.get('/value-estimate', getValueEstimate);
