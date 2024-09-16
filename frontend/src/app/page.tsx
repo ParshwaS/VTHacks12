@@ -7,6 +7,8 @@ import { Search, Home, Building2, MapPin } from "lucide-react"
 import Image from "next/image"
 // import LineChart from "./LineChart";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 const cardColors = [
   { bg: "bg-pink-100", text: "text-pink-800", icon: "text-pink-500" },
@@ -25,6 +27,24 @@ const data = [
 ]
 
 export default function LandingPage() {
+
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const router = useRouter();
+
+  const handleClick = () => {
+    fetch(`http://localhost:8000/text/${searchTerm}`).then((response) => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.json();
+    }).then((data) => {
+      router.push('/Analysis?zipcode='+data.zipcode);
+    }).catch((error) => {
+      console.error('Error fetching data:', error);
+    });
+  };
+
   return (
     <div className="min-h-screen bg-background">
       {/* Hero Section */}
@@ -43,8 +63,10 @@ export default function LandingPage() {
         <div className="container relative z-10 flex h-full flex-col items-center justify-center">
           <h3 className="mb-6 text-2xl font-bold text-white md:text-5xl">Enhance your Real Estate Investment!</h3>
           <div className="flex w-full max-w-md items-center space-x-2">
-            <Input className="bg-white" placeholder="Search for properties..." />
-            <Button type="submit">
+            <Input onChange={(event) => {
+              setSearchTerm(event.target.value);
+            }} className="bg-white" placeholder="Search for properties..." />
+            <Button onClick={() => handleClick()} type="submit">
               <Search className="h-4 w-4" />
             </Button>
           </div>
@@ -86,15 +108,15 @@ export default function LandingPage() {
                 <CardTitle>Housing Price Trends</CardTitle>
               </CardHeader>
               <CardContent className="h-80">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={data}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="month" />
-                  <YAxis />
-                  <Tooltip />
-                  <Line type="monotone" dataKey="price" stroke="#8884d8" strokeWidth={2} />
-                </LineChart>
-              </ResponsiveContainer>
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={data}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="month" />
+                    <YAxis />
+                    <Tooltip />
+                    <Line type="monotone" dataKey="price" stroke="#8884d8" strokeWidth={2} />
+                  </LineChart>
+                </ResponsiveContainer>
               </CardContent>
             </Card>
             <Card>

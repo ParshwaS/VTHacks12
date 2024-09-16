@@ -42,12 +42,14 @@ const MapView = ({ setSelectedZip, selectedZip }: { setSelectedZip: Function, se
 				// Highlight the newly selected zip code
 				setSelectedLayer(layer);
 				(layer as L.Path).setStyle(highlightStyle);
-
-				console.log('Clicked Zip Code:', feature.properties?.zip);
 			},
 		});
 
 		// Bind tooltip to show zip code
+		if (feature.properties?.zip == selectedZip) {
+			setSelectedLayer(layer);
+		}
+
 		if (feature.properties?.zip) {
 			layer.bindTooltip(feature.properties.zip, {
 				permanent: true,

@@ -51,8 +51,6 @@ const GraphsPage = () => {
         <div className="card flex flex-col justify-center col-span-7 items-center align-middle bg-white p-4 shadow-md end-0 rounded-lg">
           <h2 className="text-xl font-semibold mb-2">Rental & Sale price Growth Rate</h2>
           <Correlation zipcode={selectedZip} />
-
-
         </div>
       </div>
 

@@ -22,9 +22,11 @@ const CrimeRate = ({ zipcode }: { zipcode: string | null }) => {
 
   useEffect(() => {
     // Fetching data from the service
-    qolService.getQol(zipcode).then((data: CrimeData[]) => {
-      setDummyData_(data); // Set the fetched data to state
-    });
+    if (zipcode) {
+      qolService.getQol(zipcode).then((data: CrimeData[]) => {
+        setDummyData_(data); // Set the fetched data to state
+      });
+    }
   }, [zipcode]);
 
   useEffect(() => {

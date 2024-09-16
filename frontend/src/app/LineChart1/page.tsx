@@ -24,17 +24,19 @@ const LineChart1 = ({ zipcode }: { zipcode: string | null }) => {
 
   useEffect(() => {
     // Fetching data from the service and setting it to GDdata
-    LineChart1Service.getLinePts(zipcode).then((dummyData_) => {
-      const mappedData = dummyData_.map((d: any) => ({
-        quarter: d.quarter, // Keep the quarter string
-        "1-bedroom": d.rentals["1_bedroom"].average_rent,
-        "2-bedroom": d.rentals["2_bedroom"].average_rent,
-        "3-bedroom": d.rentals["3_bedroom"].average_rent,
-        "4-bedroom": d.rentals["4_bedroom"].average_rent
-      }));
-      console.log(mappedData);
-      setGDdata(mappedData);
-    });
+    if (zipcode) {
+      LineChart1Service.getLinePts(zipcode).then((dummyData_) => {
+        const mappedData = dummyData_.map((d: any) => ({
+          quarter: d.quarter, // Keep the quarter string
+          "1-bedroom": d.rentals["1_bedroom"].average_rent,
+          "2-bedroom": d.rentals["2_bedroom"].average_rent,
+          "3-bedroom": d.rentals["3_bedroom"].average_rent,
+          "4-bedroom": d.rentals["4_bedroom"].average_rent
+        }));
+        console.log(mappedData);
+        setGDdata(mappedData);
+      });
+    }
   }, [zipcode]);
 
   useEffect(() => {

@@ -1,10 +1,22 @@
 from fastapi import FastAPI
-from pydantic import BaseModel
 import spacy
 import requests
 
+# CORS middleware
+from fastapi.middleware.cors import CORSMiddleware
+
+# Add CORS middleware
+
 nlp_en = spacy.load("en_core_web_sm")
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allows all origins
+    allow_credentials=True,
+    allow_methods=["*"],  # Allows all methods
+    allow_headers=["*"],  # Allows all headers
+)
 
 @app.get("/text/{data}")
 def extract_entities(data: str):
@@ -21,8 +33,9 @@ def extract_entities(data: str):
                 location_data = response.json()
                 if location_data:
                     coords = location_data[0]
-                    ents[-1]["coordinates"] = {"lat": coords["lat"], "lon": coords["lon"]}
-    return {"message": data, "ents": ents}
+                    zipcode = get_location(coords["lat"], coords["lon"])
+                    ents[-1]["coordinates"] = {"lat": coords["lat"], "lon": coords["lon"], "zipcode": zipcode["postcode"]}
+    return {"message": data, "ents": ents, "zipcode": zipcode["postcode"] if 'zipcode' in locals() else None}
 
 @app.get("/point/{lat}/{lon}")
 def get_location(lat: float, lon: float):
@@ -41,3 +54,20 @@ def get_location(lat: float, lon: float):
             "state": location_data.get("address", {}).get("state"),
         }
     return {"error": "Location not found"}
+
+# Get lat lon from zip code
+@app.get("/zip/{zipcode}")
+def get_lat_lon(zipcode: str):
+    # OSM API to get the coordinates from the zip code
+    headers = {'User-Agent': 'Mozilla/5.0'}
+    response = requests.get(f"https://nominatim.openstreetmap.org/search?postalcode={zipcode}&format=jsonv2", headers=headers)
+    if response.status_code == 200:
+        location_data = response.json()
+        if location_data:
+            coords = location_data[0]
+            return {
+                "latitude": coords["lat"],
+                "longitude": coords["lon"],
+                "location": coords.get("display_name"),
+            }
+    return {"error": "Coordinates not found"}

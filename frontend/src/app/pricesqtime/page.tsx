@@ -14,9 +14,11 @@ const PricesByTimeChart = ({ zipcode }: { zipcode: string | null }) => {
 
   useEffect(() => {
     // Fetching data from the service
-    pricesqtimeService.getPts(zipcode).then((dummyData_) => {
-      setDummyData1(dummyData_);
-    });
+    if (zipcode) {
+      pricesqtimeService.getPts(zipcode).then((dummyData_) => {
+        setDummyData1(dummyData_);
+      });
+    }
   }, [zipcode]);
 
   useEffect(() => {

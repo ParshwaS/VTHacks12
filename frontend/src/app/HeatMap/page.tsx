@@ -53,7 +53,7 @@ const Heatmap = ({ zipcode }: { zipcode: string | null }) => {
       setData(result);
     };
 
-    fetchData();
+    if (zipcode) { fetchData(); }
   }, [zipcode]);
 
   useEffect(() => {

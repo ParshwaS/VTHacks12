@@ -10,14 +10,16 @@ interface DataPoint {
 }
 
 function Correlation({ zipcode }: { zipcode: string | null }) {
-  
+
   const [data, setDummyData] = useState<DataPoint[]>([]);
 
   useEffect(() => {
-    corelationServices.getcorelation(zipcode).then((dumy_data: any) => {
-      setDummyData(dumy_data);
-      console.log(dumy_data);
-    });
+    if (zipcode) {
+      corelationServices.getcorelation(zipcode).then((dumy_data: any) => {
+        setDummyData(dumy_data);
+        console.log(dumy_data);
+      });
+    }
   }, [zipcode]);
 
   useEffect(() => {
